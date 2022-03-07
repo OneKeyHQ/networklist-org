@@ -3,11 +3,9 @@ name: dev
 on:
   push:
     branches:
-      - onekey
       - main
   pull_request:
     branches:
-      - onekey
       - main
 jobs:
   dev:
@@ -39,7 +37,7 @@ jobs:
           cname: ${{ env.ENDPOINT }}
           force_orphan: true
       - name: Comment on PR
-        if: ${{ github.ref != 'refs/heads/onekey' }}
+        if: ${{ github.ref != 'refs/heads/main' }}
         uses: actions/github-script@v3
         env:
           SHA: ${{ github.sha }}
