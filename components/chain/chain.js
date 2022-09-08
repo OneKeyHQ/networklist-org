@@ -16,6 +16,19 @@ import {
   ACCOUNT_CONFIGURED
 } from '../../stores/constants'
 
+const TOKEN_BLACK_LIST = ['INFURA_API_KEY', 'ALCHEMY_API_KEY'];
+
+const replaceTokenEndpoint = (rpcList) => {
+  return rpcList[0].replace('${ALCHEMY_API_KEY}', process.env.NEXT_PUBLIC_ALCHEMY_TOKEN).replace('${INFURA_API_KEY}', process.env.NEXT_PUBLIC_INFRUA_TOKEN);
+}
+
+const findBestRPCEndpoint = (rpcList) => {
+  const target = rpcList.find(item => {
+    return !TOKEN_BLACK_LIST.some(blackItem => item.includes(blackItem));
+  });
+  return target ?? replaceTokenEndpoint(rpcList);
+}
+
 export default function Chain({ chain }) {
   const router = useRouter()
 
@@ -55,7 +68,7 @@ export default function Chain({ chain }) {
         symbol: chain.nativeCurrency.symbol, // 2-6 characters long
         decimals: chain.nativeCurrency.decimals,
       },
-      rpcUrls: chain.rpc,
+      rpcUrls: [findBestRPCEndpoint(chain.rpc)],
       blockExplorerUrls: [ ((chain.explorers && chain.explorers.length > 0 && chain.explorers[0].url) ? chain.explorers[0].url : chain.infoURL) ]
     }
 
