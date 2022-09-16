@@ -79,9 +79,40 @@ const searchTheme = createTheme({
 
 const fetcher = (...args) => fetch(...args).then(res => res.json())
 
-function Home({ changeTheme, theme }) {
-  const { data, error } = useSWR('https://chainid.network/chains.json', fetcher)
+const patchData = (data) => {
+  if (!data) return data;
+  return [
+    ...data,
+    {
+      name: "ETHW-mainnet",
+      chain: "ETHW",
+      icon: "ethereum",
+      rpc: ["https://mainnet.ethereumpow.org"],
+      faucets: [],
+      nativeCurrency: {
+        name: "Ether",
+        symbol: "ETHW",
+        decimals: 18,
+      },
+      infoURL: "",
+      shortName: "ethw",
+      chainId: 10001,
+      networkId: 1,
+      slip44: 60,
+      explorers: [
+        {
+          name: "eth-w",
+          url: "https://mainnet.ethwscan.com",
+          standard: "EIP3091",
+        },
+      ],
+    },
+  ];
+}
 
+function Home({ changeTheme, theme }) {
+  const { data: remoteData, error } = useSWR('https://chainid.network/chains.json', fetcher)
+  const data = patchData(remoteData);
   const [ layout, setLayout ] = useState('grid')
   const [ search, setSearch ] = useState('')
   const [ hideMultichain, setHideMultichain ] = useState('1')
